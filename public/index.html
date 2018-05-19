@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>MyStock</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+ 
+  <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+ 
+</head>
+<body>
+<h1> Welcome to Stackline Search </h1><br>
+  <h5> Select Catagory and hit serach </h5>
+  <input type="radio" name="type" value="brand" onChange="setAutoType(this);"> Brand<br>
+  <input type="radio" name="type" value="catagory" onChange="setAutoType(this);"> Catagory<br>
+ <!-- <input type="radio" name="type" value="type" onChange="setAutoType(this);"> Type-->
+
+
+<br><br>
+<div class="ui-widget">
+  <label for="search">
+   <input type="text" name="search" id="tag" />
+</div>
+	
+<br><br>
+<h5>
+Or, Send Hardcoded post request</h5>
+
+<button onClick="sendSerachQuery();"> Send </button>
+
+</body>
+<script>
+ var myTag = [];
+ function setAutoType(myRadio){
+	 	var type = myRadio.value;
+		$.ajax({
+			type: 'GET',
+			url: 'http://localhost:3000/api/product/autocomplete?type=catagory&searchTermPrefix=',
+			success: function(data){
+				console.log(data);
+				console.log(data["data"][1]);
+				myTag = [];
+				for(i=0;i<data["data"].length;i++){
+					myTag.push(data["data"][i]["name"]);
+					console.log(data["data"][i]["name"]);
+				}
+			}
+		});
+
+ }
+
+
+ function sendSerachQuery(){
+	 var jsondata = {
+		 "conditions": [
+			 {
+			   "fieldName": "title",
+			   "values": [        
+				   "Thule Perspektiv TPCH-102 SLR Large Toploader",
+				   "Andoer Amaran AL-H160 CRI95+ Amaran 160 LED Video Light On Camera LED Light"
+				   ]
+			},
+			{
+			   "fieldName": "brandId",
+			   "values": [        
+				   "38388",
+				   "15300"
+				   ]
+			},
+			{
+			   "fieldName": "categoryId",
+			   "values": [        
+				   "213",
+				   "178"
+				   ]
+			},
+		 ],
+		"pagination": {
+				"from": 1,
+				"size": 50
+			} 
+	 };
+
+	 $.ajax({
+		 type: "POST",
+		 url: "http://localhost:3000/api/product/search", 
+		 data: jsondata,
+		 success: function(res){
+			console.log(res);
+		 }
+	 });
+ }
+
+ $("#tag").change(function(){
+	 $("#tag").autocomplete({
+      	source: myTag
+    });
+ })
+	
+	
+
+
+
+
+</script>
+</html>
